@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>익명 오픈채팅</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        header {
+            background-color: #ff6f00; /* 주황색 */
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+        .container {
+            display: flex;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .room-list {
+            width: 25%;
+            border-right: 1px solid #ddd;
+            padding-right: 10px;
+        }
+        .room-list h2 {
+            margin-top: 0;
+        }
+        .room {
+            padding: 10px;
+            cursor: pointer;
+            border: 1px solid #ddd;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+        .room:hover {
+            background-color: #e6e6e6;
+        }
+        .chat-section {
+            width: 75%;
+            padding-left: 10px;
+        }
+        .chat-box {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            height: 300px;
+            overflow-y: scroll;
+            background-color: #f9f9f9;
+        }
+        .chat-input {
+            display: flex;
+            margin-top: 10px;
+        }
+        .chat-input input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+        .chat-input button {
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            background-color: #ff6f00;
+            color: white;
+            cursor: pointer;
+        }
+        .chat-input button:hover {
+            background-color: #e65c00;
+        }
+        .message {
+            margin: 5px 0;
+            padding: 5px;
+            border-radius: 5px;
+            background-color: #e0e0e0;
+        }
+        .message .nickname {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        익명 오픈채팅
+    </header>
+    <div class="container">
+        <div class="room-list">
+            <h2>채팅방 목록</h2>
+            <div class="room" onclick="selectRoom('방 1')">방 1</div>
+            <div class="room" onclick="selectRoom('방 2')">방 2</div>
+            <div class="room" onclick="selectRoom('방 3')">방 3</div>
+            <div class="room" onclick="selectRoom('방 4')">방 4</div>
+        </div>
+        <div class="chat-section">
+            <h1 id="room-title">채팅방을 선택하세요</h1>
+            <div class="chat-box" id="chat-box">
+                <!-- 채팅 내용이 여기에 표시됩니다. -->
+            </div>
+            <div class="chat-input">
+                <input type="text" id="message-input" placeholder="메시지를 입력하세요...">
+                <button onclick="sendMessage()">전송</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var currentRoom = null;
+        var nickname = "#" + Math.floor(Math.random() * 9999 + 1).toString().padStart(4, '0');
+        var rooms = {
+            "방 1": [],
+            "방 2": [],
+            "방 3": [],
+            "방 4": []
+        };
+
+        // 방을 선택하는 함수
+        function selectRoom(room) {
+            currentRoom = room;
+            document.getElementById('room-title').textContent = room;
+            displayMessages();
+        }
+
+        // 메시지 전송 함수
+        function sendMessage() {
+            if (!currentRoom) {
+                alert('채팅방을 먼저 선택하세요!');
+                return;
+            }
+
+            var messageInput = document.getElementById('message-input');
+            var message = messageInput.value.trim();
+            if (message) {
+                // 현재 방의 메시지 배열에 추가
+                rooms[currentRoom].push({ nickname: nickname, message: message });
+                messageInput.value = '';
+                displayMessages();
+            }
+        }
+
+        // 엔터 키로 메시지 전송 가능하게 하기
+        document.getElementById('message-input').addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') { // 엔터 키를 확인
+                sendMessage(); // 메시지 전송
+            }
+        });
+
+        // 선택된 방의 메시지 표시 함수
+        function displayMessages() {
+            var chatBox = document.getElementById('chat-box');
+            chatBox.innerHTML = ''; // 기존 메시지 지우기
+
+            if (currentRoom && rooms[currentRoom]) {
+                rooms[currentRoom].forEach(function(chat) {
+                    var messageElement = document.createElement('div');
+                    messageElement.classList.add('message');
+
+                    var nicknameElement = document.createElement('span');
+                    nicknameElement.classList.add('nickname');
+                    nicknameElement.textContent = chat.nickname + ":";
+
+                    var textElement = document.createElement('span');
+                    textElement.textContent = chat.message;
+
+                    messageElement.appendChild(nicknameElement);
+                    messageElement.appendChild(textElement);
+                    chatBox.appendChild(messageElement);
+                });
+                chatBox.scrollTop = chatBox.scrollHeight; // 최신 메시지로 스크롤
+            }
+        }
+    </script>
+</body>
+</html>
